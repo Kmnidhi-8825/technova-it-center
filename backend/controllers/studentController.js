@@ -27,19 +27,13 @@ export const getStudentDashboard = async (req, res) => {
           course: course._id,
         });
 
-        const completedLessons =
-          progress?.completedLessons?.length || 0;
+        const completedLessons = progress?.completedLessons?.length || 0;
 
         // Calculate percentage
         const percentage =
-  totalLessons > 0
-    ? Math.min(
-        100,
-        Math.round(
-          (completedLessons / totalLessons) * 100
-        )
-      )
-    : 0;
+          totalLessons > 0
+            ? Math.min(100, Math.round((completedLessons / totalLessons) * 100))
+            : 0;
 
         return {
           course,
@@ -47,13 +41,12 @@ export const getStudentDashboard = async (req, res) => {
           completedLessons,
           percentage,
         };
-      })
+      }),
     );
 
     res.status(200).json({
       courses: dashboardCourses,
     });
-
   } catch (error) {
     console.log("Student Dashboard Error:", error);
 
