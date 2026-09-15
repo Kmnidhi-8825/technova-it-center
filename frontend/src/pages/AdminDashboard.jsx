@@ -15,6 +15,7 @@ export const AdminDashboard = () => {
   const [lessons, setLessons] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [editingLesson, setEditingLesson] = useState(null);
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 const { logout } = useAuth();
 
@@ -69,6 +70,22 @@ const handleLogout = () => {
       console.log("Fetch Courses Error :", error);
     }
   };
+
+  const fetchUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await api.get("/admin/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setUsers(res.data);
+  } catch (error) {
+    console.log("Fetch Users Error:", error);
+  }
+};
 
   const fetchLessons = async (courseId) => {
     try {
@@ -191,6 +208,7 @@ const handleLogout = () => {
   useEffect(() => {
     fetchDashboard();
     fetchCourses();
+     fetchUsers();
   }, []);
 
   if (loading) return <Loading />;
@@ -248,6 +266,75 @@ const handleLogout = () => {
           </div>
         </div>
       </div>
+
+      {/* Users Management */}
+<div className="mt-16">
+  <div className="mb-6">
+    <h2 className="text-3xl font-bold">Users Management</h2>
+    <p className="text-slate-400 mt-1">
+      View all registered users
+    </p>
+  </div>
+
+  <div className="bg-slate-900 rounded-2xl overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left">
+        <thead className="bg-slate-800">
+          <tr>
+            <th className="p-4">Name</th>
+            <th className="p-4">Email</th>
+            <th className="p-4">Role</th>
+            <th className="p-4">Registered On</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.length === 0 ? (
+            <tr>
+              <td
+                colSpan="4"
+                className="p-6 text-center text-slate-400"
+              >
+                No users found.
+              </td>
+            </tr>
+          ) : (
+            users.map((user) => (
+              <tr
+                key={user._id}
+                className="border-t border-slate-800"
+              >
+                <td className="p-4 font-semibold">
+                  {user.name}
+                </td>
+
+                <td className="p-4 text-slate-300">
+                  {user.email}
+                </td>
+
+                <td className="p-4">
+                  <span
+                    className={
+                      user.role === "admin"
+                        ? "text-red-400 font-semibold"
+                        : "text-green-400 font-semibold"
+                    }
+                  >
+                    {user.role}
+                  </span>
+                </td>
+
+                <td className="p-4 text-slate-400">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
       <div className="mt-12">
         <div className="flex justify-between items-center mb-6">
